@@ -10,6 +10,9 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.rungroup.web.Mapper.ClubMapper.mapToClub;
+import static com.rungroup.web.Mapper.ClubMapper.mapToClubDto;
+
 @Service
 public class ClubServiceImpl implements ClubService {
     private ClubRepo clubRepo;
@@ -25,19 +28,31 @@ public class ClubServiceImpl implements ClubService {
          return clubs.stream().map((club)->mapToClubDto(club)).collect(Collectors.toList());
     }
 
-    //maper that takes club and convert into DTO
-    private ClubDTO mapToClubDto(Club club) {
-        ClubDTO clubDto= ClubDTO.builder()
-                .id(club.getId())
-                .title(club.getTitle())
-                .photoUrl(club.getPhotoUrl())
-                .content(club.getContent())
-                .createdTime(club.getCreatedTime())
-                .updatedTime((club.getUpdatedTime()))
-                .build();
+    @Override
+    public Club saveClub(Club club) {
+        return clubRepo.save(club);
+     }
 
-        return clubDto;
+    @Override
+    public ClubDTO getClubById(int cludId) {
+        Club club= clubRepo.findById(cludId).get();
+        return mapToClubDto(club);
     }
+
+    @Override
+    public void updateClub(ClubDTO clubDto) {
+        Club club=mapToClub(clubDto);
+        clubRepo.save(club);
+    }
+
+    @Override
+    public List<ClubDTO> searchClub(String Querry) {
+       List<Club> clublist= clubRepo.searchClubs(Querry);
+
+       return clublist.stream().map(club -> mapToClubDto(club)).collect(Collectors.toList());
+    }
+
+
 
 
 
